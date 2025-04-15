@@ -1,0 +1,44 @@
+[gd_scene load_steps=4 format=3 uid="uid://ca6k2n2lfe0nq"]
+
+[ext_resource type="Texture2D" uid="uid://cogjiwdm0ii1n" path="res://assets/Cannon_Ball.png" id="1_e7peq"]
+
+[sub_resource type="GDScript" id="GDScript_t7eop"]
+script/source = "extends Area2D
+
+var speed = 500
+var direction = Vector2.ZERO
+
+func _physics_process(delta):
+	position += direction * speed * delta
+
+	if position.x < -100 or position.x > 1400 or position.y < -100 or position.y > 800:
+		queue_free()
+
+func _on_body_entered(body):
+	if body.is_in_group(\"players\"):
+		queue_free()
+
+
+func _on_area_entered(area):
+    print(\"Zásah:\", area.name)
+
+    if area.name == \"Hitbox\":
+        queue_free()
+        get_node(\"/root/Main/UI\").remove_life(1)
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3rnyv"]
+radius = 4.0
+
+[node name="Projectile" type="Area2D"]
+collision_layer = 2
+script = SubResource("GDScript_t7eop")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_e7peq")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_3rnyv")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
